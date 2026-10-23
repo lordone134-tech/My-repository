@@ -1,7 +1,7 @@
 -- Очищаем таблицы со сбросом автоинкремента
 TRUNCATE TABLE correspondence, types_of_correspondence RESTART IDENTITY CASCADE;
 
--- 1. Заполняем справочник видов корреспонденции (ровно 10 записей)
+-- 1. Заполняем справочник видов корреспонденции (10 записей)
 INSERT INTO types_of_correspondence (
     type_code, type_name, packaging, 
     min_weight, max_weight, 
@@ -20,7 +20,7 @@ INSERT INTO types_of_correspondence (
 (9, 'Мелкий пакет', 'Пакет', 0.10, 2.00, 10.00, 40.00, 10.00, 30.00, 1.00, 20.00),
 (10, 'Открытка', 'Без упаковки', 0.00, 0.02, 9.00, 15.00, 6.00, 11.00, 0.05, 0.50);
 
--- 2. Заполняем таблицу «Корреспонденция» (ровно 10 записей, ссылающихся на коды от 1 до 10)
+-- 2. Заполняем таблицу «Корреспонденция» (10 записей)
 INSERT INTO correspondence (
     track_number, code_types_cor, weight, 
     length, width, height, sender_code, stamp_amount
