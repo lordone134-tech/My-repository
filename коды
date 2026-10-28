@@ -2,9 +2,19 @@
 SELECT track_number FROM correspondence
 WHERE code_types_cor IN (SELECT type_code FROM types_of_correspondence WHERE packaging = 'Конверт');
 
--- 2. Вывести виды корреспонденции, для которых средние значения длины, ширины и высоты являются пропорциональными.
-SELECT * FROM types_of_correspondence
-WHERE ABS((min_length+max_length)/2 * (min_height+max_height)/2 - POWER((min_width+max_width)/2, 2)) < 0.01;
+---- 2. Вывести виды корреспонденции, для которых средние значения длины, ширины и высоты являются пропорциональными.
+SELECT *
+FROM (SELECT t.*,
+             (min_length + max_length) / 2 AS avg_length,
+             (min_width  + max_width)  / 2 AS avg_width,
+             (min_height + max_height) / 2 AS avg_height
+      FROM types_of_correspondence t) s
+WHERE ABS(avg_length / avg_width  - avg_width  / avg_height) < 0.01   -- д/ш = ш/в
+   OR ABS(avg_height / avg_width  - avg_width  / avg_length) < 0.01   -- в/ш = ш/д
+   OR ABS(avg_width  / avg_length - avg_length / avg_height) < 0.01   -- ш/д = д/в
+   OR ABS(avg_height / avg_length - avg_length / avg_width)  < 0.01   -- в/д = д/ш
+   OR ABS(avg_length / avg_height - avg_height / avg_width)  < 0.01   -- д/в = в/ш
+   OR ABS(avg_width  / avg_height - avg_height / avg_length) < 0.01;  -- ш/в = в/д
 
 -- 7. Посчитать сколько различных видов упаковки использовалось для конвертов, бандеролей и посылок.
 SELECT t.type_name, COUNT(DISTINCT t.packaging) AS kinds
