@@ -1,13 +1,12 @@
--- 1
+-- 1. Вывести трек-номера для всей корреспонденции, отправленной в конвертах.
 SELECT track_number FROM correspondence
 WHERE code_types_cor IN (SELECT type_code FROM types_of_correspondence WHERE packaging = 'Конверт');
 
--- 2
+-- 2. Вывести виды корреспонденции, для которых средние значения длины, ширины и высоты являются пропорциональными.
 SELECT * FROM types_of_correspondence
 WHERE ABS((min_length+max_length)/2 * (min_height+max_height)/2 - POWER((min_width+max_width)/2, 2)) < 0.01;
 
--- 7
+-- 7. Посчитать сколько различных видов упаковки использовалось для конвертов, бандеролей и посылок.
 SELECT t.type_name, COUNT(DISTINCT t.packaging) AS kinds
 FROM correspondence c JOIN types_of_correspondence t ON c.code_types_cor = t.type_code
 GROUP BY t.type_name;
-
