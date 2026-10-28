@@ -1,0 +1,35 @@
+-- 1
+SELECT track_number FROM correspondence
+WHERE code_types_cor IN (SELECT type_code FROM types_of_correspondence WHERE packaging = 'Конверт');
+
+-- 2
+SELECT * FROM types_of_correspondence
+WHERE ABS((min_length+max_length)/2 * (min_height+max_height)/2 - POWER((min_width+max_width)/2, 2)) < 0.01;
+
+-- 3
+SELECT c.track_number, c.weight, c.length, c.width, c.height, t.*
+INTO new_table
+FROM correspondence c JOIN types_of_correspondence t ON c.code_types_cor = t.type_code
+WHERE t.packaging = 'Конверт';
+
+-- 4
+INSERT INTO new_table
+SELECT c.track_number, c.weight, c.length, c.width, c.height, t.*
+FROM correspondence c JOIN types_of_correspondence t ON c.code_types_cor = t.type_code
+WHERE c.length NOT BETWEEN t.min_length AND t.max_length
+   OR c.width  NOT BETWEEN t.min_width  AND t.max_width
+   OR c.height NOT BETWEEN t.min_height AND t.max_height;
+
+-- 5
+UPDATE new_table
+SET length = length + 1, width = width + 1, height = height + 1
+WHERE packaging = 'Конверт' AND MOD(weight, 1) <> 0;
+
+-- 6
+DELETE FROM new_table
+WHERE track_number LIKE '  %' OR track_number LIKE '%  ';
+
+-- 7
+SELECT t.type_name, COUNT(DISTINCT t.packaging) AS kinds
+FROM correspondence c JOIN types_of_correspondence t ON c.code_types_cor = t.type_code
+GROUP BY t.type_name;
